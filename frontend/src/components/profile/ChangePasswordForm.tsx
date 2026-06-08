@@ -9,14 +9,16 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 
 export function ChangePasswordForm() {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const { inset, scrollIntoView } = useKeyboardInset();
+  const formRef = useRef<HTMLFormElement>(null);
+  const { inset, scrollAboveKeyboard } = useKeyboardInset();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleFieldFocus = () => scrollIntoView(cardRef.current);
+  const handleFieldFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    scrollAboveKeyboard(e.currentTarget);
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -44,48 +46,51 @@ export function ChangePasswordForm() {
   };
 
   return (
-    <div ref={cardRef} style={inset > 0 ? { marginBottom: inset } : undefined}>
-    <Card className="p-4 sm:p-6">
-      <div className="mb-4 flex items-center gap-2">
-        <KeyRound className="h-5 w-5 shrink-0 text-primary" />
-        <h2 className="text-lg font-semibold text-foreground">Change Password</h2>
-      </div>
-      <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
-        <PasswordInput
-          label="Current Password"
-          value={currentPassword}
-          onChange={(e) => setCurrentPassword(e.target.value)}
-          onFocus={handleFieldFocus}
-          required
-          autoComplete="current-password"
-        />
-        <PasswordInput
-          label="New Password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          onFocus={handleFieldFocus}
-          required
-          minLength={6}
-          autoComplete="new-password"
-        />
-        <PasswordInput
-          label="Confirm New Password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          onFocus={handleFieldFocus}
-          required
-          minLength={6}
-          autoComplete="new-password"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60 sm:w-auto sm:self-start"
-        >
-          {loading ? "Updating…" : "Update Password"}
-        </button>
-      </form>
-    </Card>
+    <div
+      className="max-lg:pb-2"
+      style={inset > 0 ? { paddingBottom: inset } : undefined}
+    >
+      <Card className="p-4 sm:p-6">
+        <div className="mb-4 flex items-center gap-2">
+          <KeyRound className="h-5 w-5 shrink-0 text-primary" />
+          <h2 className="text-lg font-semibold text-foreground">Change Password</h2>
+        </div>
+        <form ref={formRef} onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
+          <PasswordInput
+            label="Current Password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            onFocus={handleFieldFocus}
+            required
+            autoComplete="current-password"
+          />
+          <PasswordInput
+            label="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+            onFocus={handleFieldFocus}
+            required
+            minLength={6}
+            autoComplete="new-password"
+          />
+          <PasswordInput
+            label="Confirm New Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            onFocus={handleFieldFocus}
+            required
+            minLength={6}
+            autoComplete="new-password"
+          />
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60 sm:w-auto sm:self-start"
+          >
+            {loading ? "Updating…" : "Update Password"}
+          </button>
+        </form>
+      </Card>
     </div>
   );
 }

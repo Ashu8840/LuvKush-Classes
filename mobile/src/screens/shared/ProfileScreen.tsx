@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  View, Text, Image, Pressable, Alert, StyleSheet, ActivityIndicator,
-  KeyboardAvoidingView, Platform, ScrollView,
+  View, Text, Image, Pressable, Alert, StyleSheet, ActivityIndicator, ScrollView, Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
@@ -11,6 +10,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import { Card, Button } from "../../components/ui";
 import { ChangePasswordSection } from "../../components/profile/ChangePasswordSection";
+import { useKeyboardHeight } from "../../hooks/useKeyboardHeight";
 
 function getInitials(name: string) {
   return name.split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase();
@@ -43,6 +43,13 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" | 
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
+  const keyboardHeight = useKeyboardHeight();
+
+  const handlePasswordFocus = (sectionY: number) => {
+    setTimeout(() => {
+      scrollRef.current?.scrollTo({ y: Math.max(0, sectionY - 48), animated: true });
+    }, Platform.OS === "ios" ? 300 : 100);
+  };
 
   useEffect(() => {
     api.getMe()
@@ -88,16 +95,15 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" | 
   const teacherProfile = role === "teacher" ? (profile as TeacherProfile | null) : null;
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: colors.surface }}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
-    >
+    <View style={{ flex: 1, backgroundColor: colors.surface }}>
       <ScrollView
         ref={scrollRef}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: 40 + keyboardHeight },
+        ]}
         keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
+        keyboardDismissMode="interactive"
         showsVerticalScrollIndicator={false}
       >
       <Card style={styles.heroCard}>
@@ -151,7 +157,7 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" | 
         </Card>
       )}
 
-      <ChangePasswordSection scrollRef={scrollRef} />
+      <ChangePasswordSection onFieldFocus={handlePasswordFocus} />
 
       {role === "student" && studentProfile && (
         <>
@@ -239,7 +245,7 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" | 
         </>
       )}
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 

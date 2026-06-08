@@ -21,7 +21,8 @@ export function LiveClassRoom({ classId, isTeacher, onEnd }: Props) {
   const [tab, setTab] = useState<"chat" | "people">("people");
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatComposerRef = useRef<HTMLDivElement>(null);
-  const { inset: keyboardInset, scrollIntoView } = useKeyboardInset();
+  const chatInputRef = useRef<HTMLInputElement>(null);
+  const { inset: keyboardInset, scrollAboveKeyboard } = useKeyboardInset();
 
   const refresh = async () => {
     try {
@@ -210,8 +211,13 @@ export function LiveClassRoom({ classId, isTeacher, onEnd }: Props) {
         )}
 
         {tab === "chat" && (
-          <div className="flex min-h-0 flex-1 flex-col">
-            <div className="min-h-0 flex-1 overflow-y-auto p-3 space-y-2">
+          <div className="relative flex min-h-0 flex-1 flex-col max-lg:min-h-[280px]">
+            <div
+              className="min-h-0 flex-1 overflow-y-auto p-3 pb-20 space-y-2 lg:pb-3"
+              style={{
+                paddingBottom: keyboardInset > 0 ? keyboardInset + 72 : undefined,
+              }}
+            >
               {!session.chatEnabled ? (
                 <p className="text-center text-sm text-muted">Chat is disabled</p>
               ) : session.chatMessages?.length ? (
@@ -229,15 +235,16 @@ export function LiveClassRoom({ classId, isTeacher, onEnd }: Props) {
             {session.chatEnabled && isAdmitted && (
               <div
                 ref={chatComposerRef}
-                className="sticky bottom-0 z-10 flex shrink-0 items-center gap-2 border-t border-default bg-card p-3"
+                className="z-20 flex shrink-0 items-center gap-2 border-t border-default bg-card p-3 max-lg:fixed max-lg:left-0 max-lg:right-0 lg:sticky lg:bottom-0"
                 style={{
-                  paddingBottom: keyboardInset > 0 ? keyboardInset + 12 : undefined,
+                  bottom: keyboardInset > 0 ? keyboardInset : 0,
                 }}
               >
                 <input
+                  ref={chatInputRef}
                   value={chatText}
                   onChange={(e) => setChatText(e.target.value)}
-                  onFocus={() => scrollIntoView(chatComposerRef.current)}
+                  onFocus={() => scrollAboveKeyboard(chatInputRef.current)}
                   onKeyDown={(e) => e.key === "Enter" && sendChat()}
                   placeholder="Ask a question..."
                   className="input-field min-h-[44px] flex-1 rounded-xl border px-3 py-2.5 text-sm"

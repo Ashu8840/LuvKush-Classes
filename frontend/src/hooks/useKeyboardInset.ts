@@ -24,12 +24,13 @@ export function useKeyboardInset() {
     };
   }, []);
 
-  const scrollIntoView = useCallback((el: HTMLElement | null) => {
+  /** Scroll element so it sits just above the keyboard (WhatsApp-style). */
+  const scrollAboveKeyboard = useCallback((el: HTMLElement | null) => {
     if (!el) return;
     requestAnimationFrame(() => {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      el.scrollIntoView({ behavior: "smooth", block: "end", inline: "nearest" });
     });
   }, []);
 
-  return { inset, scrollIntoView };
+  return { inset, scrollAboveKeyboard };
 }

@@ -7,8 +7,7 @@ import {
   FlatList,
   StyleSheet,
   Platform,
-  KeyboardAvoidingView,
-  Keyboard,
+
   ActivityIndicator,
   ListRenderItem,
 } from "react-native";
@@ -21,6 +20,9 @@ import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "../../contexts/ToastContext";
 import { Button, Badge } from "../../components/ui";
 import { useTheme } from "../../contexts/ThemeContext";
+import { useKeyboardHeight } from "../../hooks/useKeyboardHeight";
+
+const CHAT_COMPOSER_HEIGHT = 68;
 
 type Params = { classId: string; isTeacher?: boolean };
 type Tab = "people" | "chat";
@@ -45,9 +47,8 @@ export default function LiveClassRoomScreen() {
   const [chatText, setChatText] = useState("");
   const [activeTab, setActiveTab] = useState<Tab>("chat");
   const [sending, setSending] = useState(false);
-  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const keyboardHeight = useKeyboardHeight();
   const chatListRef = useRef<FlatList<LiveClassChatMessage>>(null);
-  const chatInputRef = useRef<TextInput>(null);
 
   const refresh = useCallback(
     () => api.getLiveClass(classId).then(setSession).catch(() => {}),
@@ -68,20 +69,10 @@ export default function LiveClassRoomScreen() {
   }, [session?.chatMessages?.length, activeTab]);
 
   useEffect(() => {
-    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
-    const showSub = Keyboard.addListener(showEvent, (e) => {
-      setKeyboardHeight(e.endCoordinates.height);
-      if (activeTab === "chat") {
-        setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 80);
-      }
-    });
-    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardHeight(0));
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, [activeTab]);
+    if (activeTab === "chat" && keyboardHeight > 0) {
+      setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 80);
+    }
+  }, [activeTab, keyboardHeight]);
 
   if (!session || !user) {
     return (
@@ -380,12 +371,7 @@ export default function LiveClassRoomScreen() {
           }}
         />
       ) : (
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? insets.top + 56 : 0}
-        >
-        <View style={{ flex: 1 }}>
+        <View style={styles.chatPanel}>
           {!session.chatEnabled ? (
             <View style={styles.centered}>
               <Ionicons name="chatbubble-ellipses-outline" size={40} color={colors.muted} />
@@ -397,9 +383,19 @@ export default function LiveClassRoomScreen() {
               data={messages}
               keyExtractor={(m) => m._id}
               renderItem={renderChatItem}
+              style={{ flex: 1 }}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="interactive"
               contentContainerStyle={[
                 styles.chatList,
                 messages.length === 0 && { flex: 1, justifyContent: "center" },
+                {
+                  paddingBottom:
+                    CHAT_COMPOSER_HEIGHT +
+                    insets.bottom +
+                    (Platform.OS === "ios" ? keyboardHeight : 0) +
+                    12,
+                },
               ]}
               ListEmptyComponent={
                 <View style={{ alignItems: "center", padding: 24 }}>
@@ -421,14 +417,17 @@ export default function LiveClassRoomScreen() {
                 {
                   backgroundColor: colors.card,
                   borderTopColor: colors.border,
-                  paddingBottom: Platform.OS === "ios"
-                    ? insets.bottom + 8
-                    : Math.max(insets.bottom + 8, keyboardHeight > 0 ? 8 : insets.bottom + 8),
+                  bottom:
+                    Platform.OS === "ios"
+                      ? keyboardHeight > 0
+                        ? keyboardHeight
+                        : insets.bottom
+                      : 0,
+                  paddingBottom: Platform.OS === "android" ? insets.bottom + 8 : 8,
                 },
               ]}
             >
               <TextInput
-                ref={chatInputRef}
                 value={chatText}
                 onChangeText={setChatText}
                 placeholder="Type a message..."
@@ -436,7 +435,7 @@ export default function LiveClassRoomScreen() {
                 multiline
                 maxLength={500}
                 style={[styles.chatInput, { color: colors.text, backgroundColor: colors.surface, borderColor: colors.border }]}
-                onFocus={() => setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 100)}
+                onFocus={() => setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 120)}
                 onSubmitEditing={sendChat}
                 blurOnSubmit={false}
               />
@@ -457,7 +456,6 @@ export default function LiveClassRoomScreen() {
             </View>
           )}
         </View>
-        </KeyboardAvoidingView>
       )}
     </View>
   );
@@ -541,7 +539,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   smallIconBtn: { padding: 8 },
-  chatList: { padding: 12, paddingBottom: 8 },
+  chatPanel: { flex: 1, position: "relative" },
+  chatList: { padding: 12 },
   bubbleRow: { flexDirection: "row", marginBottom: 10, alignItems: "flex-end", gap: 8 },
   bubbleRowMine: { justifyContent: "flex-end" },
   chatAvatar: {
@@ -561,6 +560,9 @@ const styles = StyleSheet.create({
   bubbleText: { fontSize: 15, lineHeight: 20 },
   bubbleTime: { fontSize: 10, marginTop: 4, alignSelf: "flex-end" },
   chatComposer: {
+    position: "absolute",
+    left: 0,
+    right: 0,
     flexDirection: "row",
     alignItems: "flex-end",
     gap: 8,
