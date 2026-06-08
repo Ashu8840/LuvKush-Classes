@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, Pressable, StyleSheet, ActivityIndicator } from "react-native";
+import { View, Text, Image, Pressable, StyleSheet, ActivityIndicator, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { api, PublicTestimonial } from "../../lib/api";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -61,7 +61,14 @@ export function TestimonialsCarousel() {
             />
           ))}
         </View>
-        <Text style={[styles.message, { color: colors.text }]}>&ldquo;{item.message}&rdquo;</Text>
+        <ScrollView
+          style={styles.messageScroll}
+          contentContainerStyle={styles.messageScrollContent}
+          nestedScrollEnabled
+          showsVerticalScrollIndicator
+        >
+          <Text style={[styles.message, { color: colors.text }]}>&ldquo;{item.message}&rdquo;</Text>
+        </ScrollView>
         <View style={[styles.footer, { borderTopColor: colors.border }]}>
           <Avatar name={item.student.name} avatar={item.student.avatar} colors={colors} />
           <View>
@@ -107,12 +114,24 @@ export function TestimonialsCarousel() {
   );
 }
 
+const CARD_HEIGHT = 280;
+
 const styles = StyleSheet.create({
-  card: { borderRadius: 20, borderWidth: 1, padding: 20, position: "relative" },
+  card: {
+    borderRadius: 20,
+    borderWidth: 1,
+    padding: 20,
+    position: "relative",
+    height: CARD_HEIGHT,
+    flexDirection: "column",
+    overflow: "hidden",
+  },
   quoteIcon: { position: "absolute", right: 16, top: 16 },
   stars: { flexDirection: "row", gap: 2, marginBottom: 12 },
+  messageScroll: { flex: 1, minHeight: 0 },
+  messageScrollContent: { flexGrow: 1 },
   message: { fontSize: 14, lineHeight: 22 },
-  footer: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 16, paddingTop: 14, borderTopWidth: 1 },
+  footer: { flexDirection: "row", alignItems: "center", gap: 12, marginTop: 12, paddingTop: 14, borderTopWidth: 1, flexShrink: 0 },
   avatar: { width: 44, height: 44, borderRadius: 22, borderWidth: 2, alignItems: "center", justifyContent: "center", overflow: "hidden" },
   avatarImg: { width: "100%", height: "100%" },
   controls: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 16, marginTop: 16 },

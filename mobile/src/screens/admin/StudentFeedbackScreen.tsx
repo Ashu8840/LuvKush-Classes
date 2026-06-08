@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Pressable, Alert, StyleSheet, ActivityIndicator, Linking } from "react-native";
+import { View, Text, Pressable, Alert, StyleSheet, ActivityIndicator, Linking, ScrollView } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { api, ContactStatus, Feedback, FeedbackCategory } from "../../lib/api";
@@ -162,7 +162,7 @@ export default function AdminStudentFeedbackScreen() {
         </Card>
       ) : (
         items.map((f) => (
-          <Card key={f._id} style={{ marginTop: 12 }}>
+          <Card key={f._id} style={{ ...styles.feedbackCard, marginTop: 12 }}>
             <View style={styles.cardHeader}>
               <View style={{ flex: 1 }}>
                 <View style={styles.badges}>
@@ -222,10 +222,17 @@ export default function AdminStudentFeedbackScreen() {
               </Pressable>
             </View>
 
-            <Text style={{ color: colors.text, fontSize: 14, marginTop: 10, lineHeight: 20 }}>{f.message}</Text>
+            <ScrollView
+              style={styles.messageScroll}
+              contentContainerStyle={styles.messageScrollContent}
+              nestedScrollEnabled
+              showsVerticalScrollIndicator
+            >
+              <Text style={{ color: colors.text, fontSize: 14, lineHeight: 20 }}>{f.message}</Text>
+            </ScrollView>
 
             {f.isContactInquiry && f.contact && (
-              <View style={styles.actionRow}>
+              <View style={[styles.actionRow, styles.actionRowShrink]}>
                 {f.contact.status !== "contacted" && (
                   <Pressable
                     onPress={() => setContactStatus(f._id, "contacted")}
@@ -253,6 +260,7 @@ export default function AdminStudentFeedbackScreen() {
                 disabled={togglingId === f._id}
                 style={[
                   styles.actionBtn,
+                  styles.actionRowShrink,
                   {
                     marginTop: 10,
                     backgroundColor: f.approvedForHomepage ? "#f0fdf4" : colors.surface,
@@ -284,13 +292,19 @@ export default function AdminStudentFeedbackScreen() {
   );
 }
 
+const ADMIN_CARD_HEIGHT = 320;
+
 const styles = StyleSheet.create({
   statsRow: { flexDirection: "row", gap: 10, marginTop: 12, marginBottom: 4 },
+  feedbackCard: { height: ADMIN_CARD_HEIGHT, flexDirection: "column", overflow: "hidden" },
+  messageScroll: { flex: 1, minHeight: 0, marginTop: 10 },
+  messageScrollContent: { flexGrow: 1 },
   cardHeader: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
   badges: { flexDirection: "row", flexWrap: "wrap", gap: 6 },
   badge: { fontSize: 11, fontWeight: "600", paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, overflow: "hidden" },
   stars: { flexDirection: "row", gap: 2, marginTop: 4 },
   actionRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 12 },
+  actionRowShrink: { flexShrink: 0 },
   actionBtn: { borderWidth: 1, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 8 },
   pagination: { flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 16, marginTop: 16, marginBottom: 24 },
 });

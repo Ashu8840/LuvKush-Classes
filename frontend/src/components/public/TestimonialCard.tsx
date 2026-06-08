@@ -17,11 +17,15 @@ function StudentAvatar({ name, avatar }: { name: string; avatar?: string }) {
   );
 }
 
+const CARD_HEIGHT = "h-[280px]";
+
 export function TestimonialCard({ item }: { item: PublicTestimonial }) {
   return (
-    <article className="group relative flex h-full flex-col rounded-2xl border border-default bg-card p-6 card-shadow transition hover:-translate-y-1 hover:border-primary/40">
+    <article
+      className={`group relative flex ${CARD_HEIGHT} flex-col overflow-hidden rounded-2xl border border-default bg-card p-6 card-shadow transition hover:-translate-y-1 hover:border-primary/40`}
+    >
       <Quote className="absolute right-5 top-5 h-8 w-8 text-primary/15 transition group-hover:text-primary/25" />
-      <div className="mb-4 flex gap-0.5">
+      <div className="mb-4 flex shrink-0 gap-0.5">
         {Array.from({ length: 5 }).map((_, i) => (
           <Star
             key={i}
@@ -29,8 +33,10 @@ export function TestimonialCard({ item }: { item: PublicTestimonial }) {
           />
         ))}
       </div>
-      <p className="flex-1 text-sm leading-relaxed text-foreground">&ldquo;{item.message}&rdquo;</p>
-      <div className="mt-5 flex items-center gap-3 border-t border-default/60 pt-4">
+      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+        <p className="text-sm leading-relaxed text-foreground">&ldquo;{item.message}&rdquo;</p>
+      </div>
+      <div className="mt-4 flex shrink-0 items-center gap-3 border-t border-default/60 pt-4">
         <StudentAvatar name={item.student.name} avatar={item.student.avatar} />
         <div>
           <p className="text-sm font-semibold text-foreground">{item.student.name}</p>

@@ -43,7 +43,7 @@ export function TestimonialsSection() {
         {loading ? (
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-56 rounded-2xl" />
+              <Skeleton key={i} className="h-[280px] rounded-2xl" />
             ))}
           </div>
         ) : items.length === 0 ? (
@@ -52,7 +52,7 @@ export function TestimonialsSection() {
           </div>
         ) : (
           <div className="relative mt-12">
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid items-stretch gap-6 md:grid-cols-3">
               {items.slice(index, index + visible).map((item) => (
                 <TestimonialCard key={item._id} item={item} />
               ))}

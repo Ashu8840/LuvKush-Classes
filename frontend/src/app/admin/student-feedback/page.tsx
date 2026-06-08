@@ -179,7 +179,7 @@ function AdminStudentFeedbackContent() {
       {loading ? (
         <div className="space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+            <Skeleton key={i} className="h-[320px] w-full rounded-2xl" />
           ))}
         </div>
       ) : items.length === 0 ? (
@@ -190,8 +190,8 @@ function AdminStudentFeedbackContent() {
       ) : (
         <div className="space-y-4">
           {items.map((f) => (
-            <Card key={f._id} className="relative">
-              <div className="flex flex-wrap items-start justify-between gap-3">
+            <Card key={f._id} className="relative flex h-[320px] flex-col overflow-hidden">
+              <div className="flex shrink-0 flex-wrap items-start justify-between gap-3">
                 <div className="flex flex-1 gap-3">
                   {f.isContactInquiry && f.contact ? (
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-light">
@@ -316,7 +316,9 @@ function AdminStudentFeedbackContent() {
                   </button>
                 </div>
               </div>
-              <p className="mt-3 whitespace-pre-wrap text-sm text-foreground">{f.message}</p>
+              <div className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
+                <p className="whitespace-pre-wrap text-sm text-foreground">{f.message}</p>
+              </div>
             </Card>
           ))}
         </div>
@@ -360,7 +362,7 @@ export default function AdminStudentFeedbackPage() {
       fallback={
         <div className="space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-32 w-full rounded-2xl" />
+            <Skeleton key={i} className="h-[320px] w-full rounded-2xl" />
           ))}
         </div>
       }
