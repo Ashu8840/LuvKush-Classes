@@ -7,6 +7,7 @@ import { formatCurrency, formatDate } from "../../lib/utils";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import { Screen, Card, Button } from "../../components/ui";
+import { ChangePasswordSection } from "../../components/profile/ChangePasswordSection";
 
 function getInitials(name: string) {
   return name.split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase();
@@ -32,7 +33,7 @@ function ReadOnlyField({ label, value }: { label: string; value: string }) {
   );
 }
 
-export default function ProfileScreen({ role }: { role: "student" | "teacher" }) {
+export default function ProfileScreen({ role }: { role: "student" | "teacher" | "admin" }) {
   const { colors } = useTheme();
   const { user, setUserAvatar } = useAuth();
   const [profile, setProfile] = useState<StudentProfile | TeacherProfile | null>(null);
@@ -109,7 +110,9 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" })
         <Text style={[styles.role, { color: colors.muted }]}>{role}</Text>
         <Text style={[styles.email, { color: colors.muted }]}>{user?.email}</Text>
         <Text style={[styles.hint, { color: colors.muted }]}>
-          Only your profile photo can be changed. Institute records are managed by admin.
+          {role === "admin"
+            ? "You can update your profile photo and password. Other account details are managed by the institute."
+            : "Only your profile photo can be changed. Institute records are managed by admin."}
         </Text>
         <Button label="Change Profile Photo" onPress={pickAvatar} disabled={uploading} small />
       </Card>
@@ -120,7 +123,20 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" })
         <ReadOnlyField label="Email" value={user?.email || ""} />
         <ReadOnlyField label="Phone" value={user?.phone || ""} />
         <ReadOnlyField label="Member Since" value={user?.createdAt ? formatDate(user.createdAt) : ""} />
+        {role === "admin" && (
+          <ReadOnlyField label="Last Login" value={user?.lastLogin ? formatDate(user.lastLogin) : ""} />
+        )}
       </View>
+
+      {role === "admin" && (
+        <Card style={{ marginTop: 8 }}>
+          <Text style={{ color: colors.muted, fontSize: 14, lineHeight: 20 }}>
+            You have full access to manage students, teachers, courses, fees, exams, and institute records.
+          </Text>
+        </Card>
+      )}
+
+      <ChangePasswordSection />
 
       {role === "student" && studentProfile && (
         <>

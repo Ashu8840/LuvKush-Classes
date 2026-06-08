@@ -143,7 +143,7 @@ const getStudents = async (req, res) => {
 
     const userIds = students.map((s) => s._id);
     const profiles = await StudentProfile.find({ user: { $in: userIds } })
-      .populate("user", "name email phone avatar isActive isArchived")
+      .populate("user", "name email phone avatar isActive isArchived recoverablePassword")
       .populate("course batch teacher", "name");
 
     const data = { students, profiles };
@@ -452,7 +452,7 @@ const getTeachers = async (req, res) => {
 
     const userIds = teachers.map((t) => t._id);
     const profiles = await TeacherProfile.find({ user: { $in: userIds } })
-      .populate("user", "name email phone avatar isActive isArchived")
+      .populate("user", "name email phone avatar isActive isArchived recoverablePassword")
       .populate("batches", "name timing");
 
     const data = { teachers, profiles };

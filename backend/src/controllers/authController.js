@@ -119,13 +119,37 @@ const getMe = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      return res.status(400).json({ success: false, message: "All password fields are required" });
+    }
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ success: false, message: "New passwords do not match" });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ success: false, message: "Password must be at least 6 characters" });
+    }
+
+    const user = await User.findById(req.user._id).select("+password");
+    if (!user || !(await user.comparePassword(currentPassword))) {
+      return res.status(401).json({ success: false, message: "Current password is incorrect" });
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ success: true, message: "Password updated successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 const updateProfile = async (req, res) => {
   try {
     const { avatar } = req.body;
-
-    if (!["student", "teacher"].includes(req.user.role)) {
-      return res.status(403).json({ success: false, message: "Only students and teachers can update their profile" });
-    }
 
     if (!avatar || typeof avatar !== "string") {
       return res.status(400).json({ success: false, message: "Avatar URL is required" });
@@ -155,4 +179,4 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { register, login, getMe, updateProfile };
+module.exports = { register, login, getMe, updateProfile, changePassword };

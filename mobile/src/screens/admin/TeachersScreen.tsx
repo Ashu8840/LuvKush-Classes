@@ -1,13 +1,22 @@
 import { useEffect, useState } from "react";
-import { Text, StyleSheet, Alert, View, Pressable } from "react-native";
+import { Text, Alert, View, Pressable } from "react-native";
 import { api, Pagination as PaginationMeta } from "../../lib/api";
 import { toast } from "../../contexts/ToastContext";
-import { Screen, Card, Button, Input, AppModal, Badge, Pagination } from "../../components/ui";
+import { Screen, Button, Input, AppModal, Pagination } from "../../components/ui";
+import { UserManagementCard } from "../../components/admin/UserManagementCard";
 import { useTheme } from "../../contexts/ThemeContext";
 
 type Profile = {
   _id: string;
-  user: { _id: string; name: string; email: string; phone?: string; isActive: boolean };
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    avatar?: string;
+    isActive: boolean;
+    recoverablePassword?: string;
+  };
   qualification: string;
   experience: string;
   subjects?: string[];
@@ -136,27 +145,24 @@ export default function AdminTeachersScreen() {
     <Screen title="Teacher Management" action={<Button label="Add Teacher" onPress={() => setModal(true)} small />}>
       <Input value={search} onChangeText={setSearch} placeholder="Search by name or email..." />
       {profiles.map((p) => (
-        <Card key={p._id}>
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.name, { color: colors.text }]}>{p.user?.name}</Text>
-              <Text style={{ color: colors.muted, fontSize: 12 }}>{p.user?.email}</Text>
-            </View>
-            <Badge label={p.user?.isActive ? "Active" : "Blocked"} variant={p.user?.isActive ? "success" : "danger"} />
-          </View>
-          <Text style={{ color: colors.text, marginTop: 8 }}>{p.qualification || "—"} · {p.experience || "—"}</Text>
-          <Text style={{ color: colors.muted, fontSize: 13, marginTop: 4 }}>Phone: {p.user?.phone || "—"}</Text>
-          <Text style={{ color: colors.muted, fontSize: 13, marginTop: 4 }}>
+        <UserManagementCard
+          key={p._id}
+          user={p.user}
+          actions={
+            <>
+              <Button label={p.user.isActive ? "Block" : "Activate"} variant={p.user.isActive ? "outline" : "primary"} small onPress={() => toggleActive(p)} />
+              <Button label="Archive" variant="danger" small onPress={() => archive(p)} />
+            </>
+          }
+        >
+          <Text style={{ color: colors.text, fontSize: 13 }}>{p.qualification || "—"} · {p.experience || "—"}</Text>
+          <Text style={{ color: colors.muted, fontSize: 13, marginTop: 2 }}>
             Subjects: {p.subjects?.join(", ") || "—"}
           </Text>
-          <Text style={{ color: colors.muted, fontSize: 13, marginTop: 4 }}>
+          <Text style={{ color: colors.muted, fontSize: 13, marginTop: 2 }}>
             Batches: {p.batches?.map((b) => b.name).join(", ") || "—"}
           </Text>
-          <View style={styles.actions}>
-            <Button label={p.user.isActive ? "Block" : "Activate"} variant={p.user.isActive ? "outline" : "primary"} small onPress={() => toggleActive(p)} />
-            <Button label="Archive" variant="danger" small onPress={() => archive(p)} />
-          </View>
-        </Card>
+        </UserManagementCard>
       ))}
       <Pagination page={page} pages={pagination.pages} onPageChange={setPage} />
       <AppModal visible={modal} title="Add New Teacher" onClose={() => setModal(false)}>
@@ -211,9 +217,3 @@ export default function AdminTeachersScreen() {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  row: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
-  name: { fontSize: 16, fontWeight: "600" },
-  actions: { flexDirection: "row", gap: 8, marginTop: 12 },
-});

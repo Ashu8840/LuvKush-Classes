@@ -1,15 +1,24 @@
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Alert } from "react-native";
+import { Text, Alert } from "react-native";
 import { api, Pagination as PaginationMeta } from "../../lib/api";
 import { toast } from "../../contexts/ToastContext";
 import { formatCurrency } from "../../lib/utils";
-import { Screen, Card, Button, Input, AppModal, Badge, Pagination } from "../../components/ui";
+import { Screen, Button, Input, AppModal, Pagination } from "../../components/ui";
 import { SelectDropdown } from "../../components/ui/SelectDropdown";
+import { UserManagementCard } from "../../components/admin/UserManagementCard";
 import { useTheme } from "../../contexts/ThemeContext";
 
 type Profile = {
   _id: string;
-  user: { _id: string; name: string; email: string; isActive: boolean };
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    avatar?: string;
+    isActive: boolean;
+    recoverablePassword?: string;
+  };
   feesStatus: string;
   totalFees: number;
   paidFees: number;
@@ -99,7 +108,6 @@ export default function AdminStudentsScreen() {
 
   const toggleActive = async (p: Profile) => {
     const next = !p.user.isActive;
-    const action = next ? "activate" : "block";
     Alert.alert(
       next ? "Activate Student" : "Block Student",
       next ? `Allow ${p.user.name} to login again?` : `Block ${p.user.name}? They cannot login until reactivated.`,
@@ -112,7 +120,7 @@ export default function AdminStudentsScreen() {
             try {
               await api.updateStudent(p.user._id, { isActive: next });
               reload();
-            } catch { toast.error(`Failed to ${action} student`); }
+            } catch { toast.error(`Failed to ${next ? "activate" : "block"} student`); }
           },
         },
       ]
@@ -122,7 +130,7 @@ export default function AdminStudentsScreen() {
   const archive = (p: Profile) => {
     Alert.alert(
       "Archive Student",
-      `Remove ${p.user.name} from active students?\n\nAll records (scores, fees, certificates, attendance) are permanently saved in the Database. They can be looked up years later.`,
+      `Remove ${p.user.name} from active students?\n\nAll records are permanently saved in the Database.`,
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -143,31 +151,31 @@ export default function AdminStudentsScreen() {
     <Screen title="Student Management" action={<Button label="Add Student" onPress={() => setModal(true)} small />}>
       <Input value={search} onChangeText={setSearch} placeholder="Search by name or email..." />
       {profiles.map((p) => (
-        <Card key={p._id}>
-          <View style={styles.row}>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.name, { color: colors.text }]}>{p.user?.name}</Text>
-              <Text style={{ color: colors.muted, fontSize: 12 }}>{p.user?.email}</Text>
-            </View>
-            <Badge label={p.user?.isActive ? "Active" : "Blocked"} variant={p.user?.isActive ? "success" : "danger"} />
-          </View>
-          <Text style={{ color: colors.muted, marginTop: 8, fontSize: 13 }}>
+        <UserManagementCard
+          key={p._id}
+          user={p.user}
+          actions={
+            <>
+              <Button
+                label={p.user.isActive ? "Block" : "Activate"}
+                variant={p.user.isActive ? "outline" : "primary"}
+                small
+                onPress={() => toggleActive(p)}
+              />
+              <Button label="Archive" variant="danger" small onPress={() => archive(p)} />
+            </>
+          }
+        >
+          <Text style={{ color: colors.muted, fontSize: 13 }}>
             {p.course?.name || "—"} · {p.batch?.name || "—"}
           </Text>
-          <Text style={{ color: colors.text, marginTop: 4, fontSize: 13 }}>
+          <Text style={{ color: colors.text, fontSize: 13 }}>
             Fees: {formatCurrency(p.paidFees)} / {formatCurrency(p.totalFees)} ({p.feesStatus})
           </Text>
-          <Text style={{ color: colors.muted, fontSize: 13 }}>Attendance: {p.attendancePercent}% · Score: {p.performanceScore}</Text>
-          <View style={styles.actions}>
-            <Button
-              label={p.user.isActive ? "Block" : "Activate"}
-              variant={p.user.isActive ? "outline" : "primary"}
-              small
-              onPress={() => toggleActive(p)}
-            />
-            <Button label="Archive" variant="danger" small onPress={() => archive(p)} />
-          </View>
-        </Card>
+          <Text style={{ color: colors.muted, fontSize: 13 }}>
+            Attendance: {p.attendancePercent}% · Score: {p.performanceScore}
+          </Text>
+        </UserManagementCard>
       ))}
       <Pagination page={page} pages={pagination.pages} onPageChange={setPage} />
       <AppModal visible={modal} title="Add New Student" onClose={() => setModal(false)}>
@@ -197,9 +205,3 @@ export default function AdminStudentsScreen() {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  row: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
-  name: { fontSize: 16, fontWeight: "600" },
-  actions: { flexDirection: "row", gap: 8, marginTop: 12 },
-});

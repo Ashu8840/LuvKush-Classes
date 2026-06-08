@@ -11,6 +11,7 @@ import { formatCurrency, formatDate } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
+import { ChangePasswordForm } from "./ChangePasswordForm";
 
 function getInitials(name: string) {
   return name
@@ -49,7 +50,7 @@ function ReadOnlyField({
   );
 }
 
-export function ProfileView({ role }: { role: "student" | "teacher" }) {
+export function ProfileView({ role }: { role: "student" | "teacher" | "admin" }) {
   const { user, setUserAvatar } = useAuth();
   const fileRef = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState<StudentProfile | TeacherProfile | null>(null);
@@ -160,7 +161,9 @@ export function ProfileView({ role }: { role: "student" | "teacher" }) {
               {success && <p className="mt-3 text-sm text-accent">{success}</p>}
               {error && <p className="mt-3 text-sm text-danger">{error}</p>}
               <p className="mt-4 text-xs text-muted">
-                Only your profile photo can be changed. Institute records are managed by admin.
+                {role === "admin"
+                  ? "You can update your profile photo and password. Other account details are managed by the institute."
+                  : "Only your profile photo can be changed. Institute records are managed by admin."}
               </p>
             </div>
           </div>
@@ -178,8 +181,28 @@ export function ProfileView({ role }: { role: "student" | "teacher" }) {
             value={authUser?.createdAt ? formatDate(authUser.createdAt) : "—"}
             icon={<Calendar className="h-3.5 w-3.5" />}
           />
+          {role === "admin" && (
+            <ReadOnlyField
+              label="Last Login"
+              value={authUser?.lastLogin ? formatDate(authUser.lastLogin) : "—"}
+              icon={<Calendar className="h-3.5 w-3.5" />}
+            />
+          )}
         </div>
       </section>
+
+      {role === "admin" && (
+        <section className="space-y-4">
+          <h2 className="text-lg font-semibold text-foreground">Administrator</h2>
+          <Card className="p-5">
+            <p className="text-sm text-muted">
+              You have full access to manage students, teachers, courses, fees, exams, and institute records.
+            </p>
+          </Card>
+        </section>
+      )}
+
+      <ChangePasswordForm />
 
       {role === "student" && studentProfile && (
         <>

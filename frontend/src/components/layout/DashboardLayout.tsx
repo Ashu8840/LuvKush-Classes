@@ -25,6 +25,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/admin/student-feedback": "Feedback & Contact",
   "/admin/reports": "Reports",
   "/admin/database": "Records Database",
+  "/admin/profile": "My Profile",
   "/teacher": "Teacher Dashboard",
   "/teacher/students": "My Students",
   "/teacher/attendance": "Attendance",

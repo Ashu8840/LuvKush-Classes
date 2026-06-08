@@ -8,10 +8,19 @@ import { formatCurrency } from "@/lib/utils";
 import { Modal } from "@/components/ui/modal";
 import { Input } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { UserManagementCard } from "@/components/admin/UserManagementCard";
 
 type Profile = {
   _id: string;
-  user: { _id: string; name: string; email: string; phone?: string; isActive: boolean };
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    avatar?: string;
+    isActive: boolean;
+    recoverablePassword?: string;
+  };
   qualification?: string;
   experience?: string;
   salary?: number;
@@ -98,59 +107,52 @@ export default function AdminTeachersPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {profiles.map((p) => (
-          <div key={p._id} className="rounded-2xl border border-default bg-card p-6">
-            <div className="flex items-start justify-between">
-              <div>
-                <h4 className="font-semibold">{p.user?.name}</h4>
-                <p className="text-sm text-muted">{p.user?.email}</p>
-                {p.user?.phone && <p className="text-xs text-muted">{p.user.phone}</p>}
-              </div>
-              <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${p.user?.isActive ? "badge-success" : "badge-danger"}`}>
-                {p.user?.isActive ? "Active" : "Blocked"}
-              </span>
-            </div>
-            <div className="mt-4 space-y-2 text-sm">
-              <p><span className="text-muted">Qualification:</span> {p.qualification || "—"}</p>
-              <p><span className="text-muted">Experience:</span> {p.experience || "—"}</p>
-              <p><span className="text-muted">Subjects:</span> {p.subjects?.join(", ") || "—"}</p>
-              <p><span className="text-muted">Batches:</span> {p.batches?.map((b) => b.name).join(", ") || "—"}</p>
-              <p><span className="text-muted">Salary:</span> {p.salary ? formatCurrency(p.salary) : "—"}</p>
-            </div>
-            <div className="mt-4 flex gap-2">
-              <button
-                onClick={() => setConfirm({
-                  title: p.user.isActive ? "Block teacher?" : "Activate teacher?",
-                  message: p.user.isActive ? `Block ${p.user.name}?` : `Activate ${p.user.name}?`,
-                  action: async () => {
-                    try {
-                      await api.updateTeacher(p.user._id, { isActive: !p.user.isActive });
-                      loadList(page);
-                      toast.success("Teacher updated");
-                    } catch { toast.error("Update failed"); }
-                  },
-                })}
-                className="rounded-lg border border-default px-3 py-1.5 text-xs font-medium hover:bg-primary-light"
-              >
-                {p.user.isActive ? "Block" : "Activate"}
-              </button>
-              <button
-                onClick={() => setConfirm({
-                  title: "Archive teacher?",
-                  message: `Archive ${p.user.name}? Records are permanently saved in the Database.`,
-                  action: async () => {
-                    try {
-                      await api.archiveTeacher(p.user._id);
-                      loadList(page);
-                      toast.success("Teacher archived");
-                    } catch { toast.error("Archive failed"); }
-                  },
-                })}
-                className="rounded-lg bg-danger-light px-3 py-1.5 text-xs font-medium text-danger"
-              >
-                Archive
-              </button>
-            </div>
-          </div>
+          <UserManagementCard
+            key={p._id}
+            user={p.user}
+            actions={
+              <>
+                <button
+                  onClick={() => setConfirm({
+                    title: p.user.isActive ? "Block teacher?" : "Activate teacher?",
+                    message: p.user.isActive ? `Block ${p.user.name}?` : `Activate ${p.user.name}?`,
+                    action: async () => {
+                      try {
+                        await api.updateTeacher(p.user._id, { isActive: !p.user.isActive });
+                        loadList(page);
+                        toast.success("Teacher updated");
+                      } catch { toast.error("Update failed"); }
+                    },
+                  })}
+                  className="rounded-lg border border-default px-3 py-1.5 text-xs font-medium hover:bg-primary-light"
+                >
+                  {p.user.isActive ? "Block" : "Activate"}
+                </button>
+                <button
+                  onClick={() => setConfirm({
+                    title: "Archive teacher?",
+                    message: `Archive ${p.user.name}? Records are permanently saved in the Database.`,
+                    action: async () => {
+                      try {
+                        await api.archiveTeacher(p.user._id);
+                        loadList(page);
+                        toast.success("Teacher archived");
+                      } catch { toast.error("Archive failed"); }
+                    },
+                  })}
+                  className="rounded-lg bg-danger-light px-3 py-1.5 text-xs font-medium text-danger"
+                >
+                  Archive
+                </button>
+              </>
+            }
+          >
+            <p><span className="text-muted">Qualification:</span> {p.qualification || "—"}</p>
+            <p><span className="text-muted">Experience:</span> {p.experience || "—"}</p>
+            <p><span className="text-muted">Subjects:</span> {p.subjects?.join(", ") || "—"}</p>
+            <p><span className="text-muted">Batches:</span> {p.batches?.map((b) => b.name).join(", ") || "—"}</p>
+            <p><span className="text-muted">Salary:</span> {p.salary ? formatCurrency(p.salary) : "—"}</p>
+          </UserManagementCard>
         ))}
       </div>
 

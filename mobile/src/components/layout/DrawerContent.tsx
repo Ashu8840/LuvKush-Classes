@@ -70,6 +70,7 @@ export const PARENT_NAV: NavItem[] = [
 ];
 
 const PROFILE_ROUTES: Partial<Record<UserRole, string>> = {
+  admin: "AdminProfile",
   student: "StudentProfile",
   teacher: "TeacherProfile",
 };

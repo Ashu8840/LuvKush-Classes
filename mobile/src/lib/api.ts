@@ -430,6 +430,11 @@ export const api = {
       method: "PUT",
       body: JSON.stringify(data),
     }),
+  changePassword: (data: { currentPassword: string; newPassword: string; confirmPassword: string }) =>
+    request<{ message: string }>("/auth/change-password", {
+      method: "PUT",
+      body: JSON.stringify(data),
+    }),
   adminDashboard: () => request<Record<string, unknown>>("/admin/dashboard"),
   adminStudents: (params?: string) =>
     request<Record<string, unknown>>(`/admin/students${params ? `?${params}` : ""}`),

@@ -14,6 +14,7 @@ import TypingLibraryScreen from "../screens/shared/TypingLibraryScreen";
 import AdminAnnouncementsScreen from "../screens/admin/AnnouncementsScreen";
 import AdminStudentFeedbackScreen from "../screens/admin/StudentFeedbackScreen";
 import AdminCertificationsScreen from "../screens/admin/CertificationsScreen";
+import AdminProfileScreen from "../screens/admin/ProfileScreen";
 
 const screens = {
   AdminDashboard: AdminDashboardScreen,
@@ -32,4 +33,6 @@ const screens = {
   AdminDatabase: AdminDatabaseScreen,
 };
 
-export default createRoleDrawer("admin", ADMIN_NAV, screens);
+export default createRoleDrawer("admin", ADMIN_NAV, screens, {
+  AdminProfile: AdminProfileScreen,
+});

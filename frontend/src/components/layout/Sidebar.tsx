@@ -81,6 +81,7 @@ function getInitials(name: string) {
 }
 
 const PROFILE_PATHS: Partial<Record<UserRole, string>> = {
+  admin: "/admin/profile",
   student: "/student/profile",
   teacher: "/teacher/profile",
 };

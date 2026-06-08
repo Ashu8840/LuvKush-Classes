@@ -8,10 +8,19 @@ import { formatCurrency } from "@/lib/utils";
 import { Modal } from "@/components/ui/modal";
 import { Input, Select } from "@/components/ui/input";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
+import { UserManagementCard } from "@/components/admin/UserManagementCard";
 
 type Profile = {
   _id: string;
-  user: { _id: string; name: string; email: string; phone?: string; isActive: boolean };
+  user: {
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    avatar?: string;
+    isActive: boolean;
+    recoverablePassword?: string;
+  };
   feesStatus: string;
   totalFees: number;
   paidFees: number;
@@ -43,12 +52,6 @@ export default function AdminStudentsPage() {
       setProfiles((data.profiles as Profile[]) || []);
       if (data.pagination) setPagination(data.pagination as PaginationMeta);
     }).catch(() => toast.error("Failed to load students"));
-  };
-
-  const load = () => {
-    loadList(page);
-    api.getCourses().then((d) => setCourses((Array.isArray(d) ? d : d.courses) as Course[])).catch(() => {});
-    api.getBatches().then((d) => setBatches((Array.isArray(d) ? d : d.batches) as Batch[])).catch(() => {});
   };
 
   useEffect(() => { loadList(page); }, [page, search]);
@@ -107,82 +110,62 @@ export default function AdminStudentsPage() {
         className="input-field w-full max-w-md rounded-xl border px-4 py-2.5 text-sm"
       />
 
-      <div className="overflow-hidden rounded-2xl border border-default">
-        <table className="w-full text-left text-sm">
-          <thead className="table-head">
-            <tr>
-              <th className="px-6 py-4 font-medium">Name</th>
-              <th className="px-6 py-4 font-medium">Course</th>
-              <th className="px-6 py-4 font-medium">Batch</th>
-              <th className="px-6 py-4 font-medium">Fees</th>
-              <th className="px-6 py-4 font-medium">Attendance</th>
-              <th className="px-6 py-4 font-medium">Performance</th>
-              <th className="px-6 py-4 font-medium">Status</th>
-              <th className="px-6 py-4 font-medium">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {profiles.map((p) => (
-              <tr key={p._id} className="border-t border-default">
-                <td className="px-6 py-4">
-                  <p className="font-medium">{p.user?.name}</p>
-                  <p className="text-xs text-muted">{p.user?.email}</p>
-                </td>
-                <td className="px-6 py-4">{p.course?.name || "—"}</td>
-                <td className="px-6 py-4">{p.batch?.name || "—"}</td>
-                <td className="px-6 py-4">
-                  <span className="capitalize">{p.feesStatus}</span>
-                  <p className="text-xs text-muted">{formatCurrency(p.paidFees)} / {formatCurrency(p.totalFees)}</p>
-                </td>
-                <td className="px-6 py-4">{p.attendancePercent}%</td>
-                <td className="px-6 py-4">{p.performanceScore}</td>
-                <td className="px-6 py-4">
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${p.user?.isActive ? "badge-success" : "badge-danger"}`}>
-                    {p.user?.isActive ? "Active" : "Blocked"}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      onClick={() => setConfirm({
-                        title: p.user.isActive ? "Block student?" : "Activate student?",
-                        message: p.user.isActive
-                          ? `${p.user.name} cannot login until reactivated.`
-                          : `Allow ${p.user.name} to login again?`,
-                        action: async () => {
-                          try {
-                            await api.updateStudent(p.user._id, { isActive: !p.user.isActive });
-                            loadList(page);
-                            toast.success(p.user.isActive ? "Student blocked" : "Student activated");
-                          } catch { toast.error("Update failed"); }
-                        },
-                      })}
-                      className="rounded-lg border border-default px-3 py-1.5 text-xs font-medium hover:bg-primary-light"
-                    >
-                      {p.user.isActive ? "Block" : "Activate"}
-                    </button>
-                    <button
-                      onClick={() => setConfirm({
-                        title: "Archive student?",
-                        message: `Archive ${p.user.name}?\n\nThey will be removed from active students but ALL records are permanently saved in the Database.`,
-                        action: async () => {
-                          try {
-                            await api.archiveStudent(p.user._id);
-                            loadList(page);
-                            toast.success("Student archived");
-                          } catch { toast.error("Archive failed"); }
-                        },
-                      })}
-                      className="rounded-lg bg-danger-light px-3 py-1.5 text-xs font-medium text-danger hover:opacity-90"
-                    >
-                      Archive
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {profiles.map((p) => (
+          <UserManagementCard
+            key={p._id}
+            user={p.user}
+            actions={
+              <>
+                <button
+                  onClick={() => setConfirm({
+                    title: p.user.isActive ? "Block student?" : "Activate student?",
+                    message: p.user.isActive
+                      ? `${p.user.name} cannot login until reactivated.`
+                      : `Allow ${p.user.name} to login again?`,
+                    action: async () => {
+                      try {
+                        await api.updateStudent(p.user._id, { isActive: !p.user.isActive });
+                        loadList(page);
+                        toast.success(p.user.isActive ? "Student blocked" : "Student activated");
+                      } catch { toast.error("Update failed"); }
+                    },
+                  })}
+                  className="rounded-lg border border-default px-3 py-1.5 text-xs font-medium hover:bg-primary-light"
+                >
+                  {p.user.isActive ? "Block" : "Activate"}
+                </button>
+                <button
+                  onClick={() => setConfirm({
+                    title: "Archive student?",
+                    message: `Archive ${p.user.name}?\n\nThey will be removed from active students but ALL records are permanently saved in the Database.`,
+                    action: async () => {
+                      try {
+                        await api.archiveStudent(p.user._id);
+                        loadList(page);
+                        toast.success("Student archived");
+                      } catch { toast.error("Archive failed"); }
+                    },
+                  })}
+                  className="rounded-lg bg-danger-light px-3 py-1.5 text-xs font-medium text-danger hover:opacity-90"
+                >
+                  Archive
+                </button>
+              </>
+            }
+          >
+            <p><span className="text-muted">Course:</span> {p.course?.name || "—"}</p>
+            <p><span className="text-muted">Batch:</span> {p.batch?.name || "—"}</p>
+            <p>
+              <span className="text-muted">Fees:</span>{" "}
+              <span className="capitalize">{p.feesStatus}</span>
+              {" — "}
+              {formatCurrency(p.paidFees)} / {formatCurrency(p.totalFees)}
+            </p>
+            <p><span className="text-muted">Attendance:</span> {p.attendancePercent}%</p>
+            <p><span className="text-muted">Performance:</span> {p.performanceScore}</p>
+          </UserManagementCard>
+        ))}
       </div>
 
       <Pagination page={page} pages={pagination.pages} onPageChange={setPage} />
