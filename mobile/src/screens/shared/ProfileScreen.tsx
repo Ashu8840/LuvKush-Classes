@@ -157,8 +157,6 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" | 
         </Card>
       )}
 
-      <ChangePasswordSection onFieldFocus={handlePasswordFocus} />
-
       {role === "student" && studentProfile && (
         <>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Academic Records</Text>
@@ -244,6 +242,8 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" | 
           )}
         </>
       )}
+
+      <ChangePasswordSection onFieldFocus={handlePasswordFocus} />
       </ScrollView>
     </View>
   );

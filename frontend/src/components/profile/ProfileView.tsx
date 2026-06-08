@@ -202,8 +202,6 @@ export function ProfileView({ role }: { role: "student" | "teacher" | "admin" })
         </section>
       )}
 
-      <ChangePasswordForm />
-
       {role === "student" && studentProfile && (
         <>
           <section className="space-y-4">
@@ -314,6 +312,8 @@ export function ProfileView({ role }: { role: "student" | "teacher" | "admin" })
           </section>
         </>
       )}
+
+      <ChangePasswordForm />
     </div>
   );
 }
