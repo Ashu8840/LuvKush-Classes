@@ -1,17 +1,22 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 import { KeyRound } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 
 export function ChangePasswordForm() {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const { inset, scrollIntoView } = useKeyboardInset();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const handleFieldFocus = () => scrollIntoView(cardRef.current);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -39,34 +44,35 @@ export function ChangePasswordForm() {
   };
 
   return (
-    <Card className="p-6">
+    <div ref={cardRef} style={inset > 0 ? { marginBottom: inset } : undefined}>
+    <Card className="p-4 sm:p-6">
       <div className="mb-4 flex items-center gap-2">
-        <KeyRound className="h-5 w-5 text-primary" />
+        <KeyRound className="h-5 w-5 shrink-0 text-primary" />
         <h2 className="text-lg font-semibold text-foreground">Change Password</h2>
       </div>
-      <form onSubmit={handleSubmit} className="grid gap-4 sm:max-w-md">
-        <Input
+      <form onSubmit={handleSubmit} className="flex w-full flex-col gap-4">
+        <PasswordInput
           label="Current Password"
-          type="password"
           value={currentPassword}
           onChange={(e) => setCurrentPassword(e.target.value)}
+          onFocus={handleFieldFocus}
           required
           autoComplete="current-password"
         />
-        <Input
+        <PasswordInput
           label="New Password"
-          type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
+          onFocus={handleFieldFocus}
           required
           minLength={6}
           autoComplete="new-password"
         />
-        <Input
+        <PasswordInput
           label="Confirm New Password"
-          type="password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          onFocus={handleFieldFocus}
           required
           minLength={6}
           autoComplete="new-password"
@@ -74,11 +80,12 @@ export function ChangePasswordForm() {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60"
+          className="w-full rounded-xl bg-primary px-5 py-3 text-sm font-medium text-primary-foreground hover:opacity-90 disabled:opacity-60 sm:w-auto sm:self-start"
         >
           {loading ? "Updating…" : "Update Password"}
         </button>
       </form>
     </Card>
+    </div>
   );
 }

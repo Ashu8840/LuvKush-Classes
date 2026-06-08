@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View, Text, Pressable, TextInput, Modal, ScrollView,
   ActivityIndicator, StyleSheet, ViewStyle,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../../contexts/ThemeContext";
 
 export function Screen({ children, title, action }: {
@@ -70,27 +71,47 @@ export function Button({ label, onPress, variant = "primary", disabled, small }:
   );
 }
 
-export function Input({ label, value, onChangeText, placeholder, secureTextEntry, keyboardType }: {
+export function Input({ label, value, onChangeText, placeholder, secureTextEntry, keyboardType, onFocus }: {
   label?: string;
   value: string;
   onChangeText: (t: string) => void;
   placeholder?: string;
   secureTextEntry?: boolean;
   keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
+  onFocus?: () => void;
 }) {
   const { colors } = useTheme();
+  const [hidden, setHidden] = useState(secureTextEntry ?? false);
+
   return (
     <View style={styles.inputWrap}>
       {label ? <Text style={[styles.inputLabel, { color: colors.text }]}>{label}</Text> : null}
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={colors.muted}
-        secureTextEntry={secureTextEntry}
-        keyboardType={keyboardType}
-        style={[styles.input, { backgroundColor: colors.card, color: colors.text, borderColor: colors.border }]}
-      />
+      <View style={styles.inputRow}>
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor={colors.muted}
+          secureTextEntry={secureTextEntry ? hidden : false}
+          keyboardType={keyboardType}
+          onFocus={onFocus}
+          style={[
+            styles.input,
+            secureTextEntry && styles.inputWithIcon,
+            { backgroundColor: colors.card, color: colors.text, borderColor: colors.border },
+          ]}
+        />
+        {secureTextEntry ? (
+          <Pressable
+            onPress={() => setHidden((v) => !v)}
+            style={styles.inputEyeBtn}
+            hitSlop={8}
+            accessibilityLabel={hidden ? "Show password" : "Hide password"}
+          >
+            <Ionicons name={hidden ? "eye-outline" : "eye-off-outline"} size={20} color={colors.muted} />
+          </Pressable>
+        ) : null}
+      </View>
     </View>
   );
 }
@@ -222,9 +243,12 @@ const styles = StyleSheet.create({
   btnSm: { paddingVertical: 8, paddingHorizontal: 12 },
   btnText: { fontWeight: "600", fontSize: 14 },
   btnTextSm: { fontSize: 12 },
-  inputWrap: { gap: 6 },
+  inputWrap: { gap: 6, marginBottom: 10 },
   inputLabel: { fontSize: 14, fontWeight: "500" },
+  inputRow: { position: "relative", justifyContent: "center" },
   input: { borderWidth: 1, borderRadius: 12, paddingHorizontal: 14, paddingVertical: 12, fontSize: 15 },
+  inputWithIcon: { paddingRight: 44 },
+  inputEyeBtn: { position: "absolute", right: 12, top: 0, bottom: 0, justifyContent: "center" },
   badge: { borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4, alignSelf: "flex-start" },
   badgeText: { fontSize: 11, fontWeight: "600", textTransform: "capitalize" },
   modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" },

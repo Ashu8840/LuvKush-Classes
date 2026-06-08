@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Platform,
   KeyboardAvoidingView,
+  Keyboard,
   ActivityIndicator,
   ListRenderItem,
 } from "react-native";
@@ -44,7 +45,9 @@ export default function LiveClassRoomScreen() {
   const [chatText, setChatText] = useState("");
   const [activeTab, setActiveTab] = useState<Tab>("chat");
   const [sending, setSending] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const chatListRef = useRef<FlatList<LiveClassChatMessage>>(null);
+  const chatInputRef = useRef<TextInput>(null);
 
   const refresh = useCallback(
     () => api.getLiveClass(classId).then(setSession).catch(() => {}),
@@ -63,6 +66,22 @@ export default function LiveClassRoomScreen() {
       setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 100);
     }
   }, [session?.chatMessages?.length, activeTab]);
+
+  useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    const showSub = Keyboard.addListener(showEvent, (e) => {
+      setKeyboardHeight(e.endCoordinates.height);
+      if (activeTab === "chat") {
+        setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 80);
+      }
+    });
+    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardHeight(0));
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, [activeTab]);
 
   if (!session || !user) {
     return (
@@ -178,12 +197,12 @@ export default function LiveClassRoomScreen() {
     );
   }
 
+  const chatKeyboardOpen = activeTab === "chat" && keyboardHeight > 0;
+  const videoHeight = chatKeyboardOpen ? 0 : 220;
+  const videoPlaceholderHeight = chatKeyboardOpen ? 0 : 140;
+
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: colors.surface }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
-    >
+    <View style={{ flex: 1, backgroundColor: colors.surface }}>
       {/* Header */}
       <View style={[styles.header, { backgroundColor: colors.card, borderBottomColor: colors.border, paddingTop: insets.top + 8 }]}>
         <View style={{ flex: 1 }}>
@@ -201,8 +220,8 @@ export default function LiveClassRoomScreen() {
       </View>
 
       {/* Video */}
-      {session.status === "live" && admitted ? (
-        <View style={styles.videoWrap}>
+      {session.status === "live" && admitted && videoHeight > 0 ? (
+        <View style={[styles.videoWrap, { height: videoHeight }]}>
           <WebView
             source={{ uri: jitsiUrl }}
             allowsFullscreenVideo
@@ -217,8 +236,8 @@ export default function LiveClassRoomScreen() {
             style={{ flex: 1, backgroundColor: "#000" }}
           />
         </View>
-      ) : (
-        <View style={[styles.videoPlaceholder, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      ) : videoPlaceholderHeight > 0 ? (
+        <View style={[styles.videoPlaceholder, { backgroundColor: colors.card, borderColor: colors.border, height: videoPlaceholderHeight }]}>
           {isTeacher && session.status === "scheduled" ? (
             <Button label="Go Live Now" onPress={goLive} />
           ) : (
@@ -230,7 +249,7 @@ export default function LiveClassRoomScreen() {
             </>
           )}
         </View>
-      )}
+      ) : null}
 
       {/* Quick actions */}
       <View style={[styles.actionRow, { borderBottomColor: colors.border }]}>
@@ -361,6 +380,11 @@ export default function LiveClassRoomScreen() {
           }}
         />
       ) : (
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? insets.top + 56 : 0}
+        >
         <View style={{ flex: 1 }}>
           {!session.chatEnabled ? (
             <View style={styles.centered}>
@@ -391,8 +415,20 @@ export default function LiveClassRoomScreen() {
           )}
 
           {session.chatEnabled && admitted && (
-            <View style={[styles.chatComposer, { backgroundColor: colors.card, borderTopColor: colors.border, paddingBottom: insets.bottom + 8 }]}>
+            <View
+              style={[
+                styles.chatComposer,
+                {
+                  backgroundColor: colors.card,
+                  borderTopColor: colors.border,
+                  paddingBottom: Platform.OS === "ios"
+                    ? insets.bottom + 8
+                    : Math.max(insets.bottom + 8, keyboardHeight > 0 ? 8 : insets.bottom + 8),
+                },
+              ]}
+            >
               <TextInput
+                ref={chatInputRef}
                 value={chatText}
                 onChangeText={setChatText}
                 placeholder="Type a message..."
@@ -400,6 +436,7 @@ export default function LiveClassRoomScreen() {
                 multiline
                 maxLength={500}
                 style={[styles.chatInput, { color: colors.text, backgroundColor: colors.surface, borderColor: colors.border }]}
+                onFocus={() => setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 100)}
                 onSubmitEditing={sendChat}
                 blurOnSubmit={false}
               />
@@ -420,8 +457,9 @@ export default function LiveClassRoomScreen() {
             </View>
           )}
         </View>
+        </KeyboardAvoidingView>
       )}
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
@@ -436,9 +474,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   liveDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#ef4444" },
-  videoWrap: { height: 220, backgroundColor: "#000" },
+  videoWrap: { backgroundColor: "#000", overflow: "hidden" },
   videoPlaceholder: {
-    height: 140,
     margin: 12,
     borderRadius: 16,
     borderWidth: 1,

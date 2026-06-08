@@ -1,12 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Image, Pressable, Alert, StyleSheet, ActivityIndicator } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  View, Text, Image, Pressable, Alert, StyleSheet, ActivityIndicator,
+  KeyboardAvoidingView, Platform, ScrollView,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { api, StudentProfile, TeacherProfile } from "../../lib/api";
 import { formatCurrency, formatDate } from "../../lib/utils";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
-import { Screen, Card, Button } from "../../components/ui";
+import { Card, Button } from "../../components/ui";
 import { ChangePasswordSection } from "../../components/profile/ChangePasswordSection";
 
 function getInitials(name: string) {
@@ -39,6 +42,7 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" | 
   const [profile, setProfile] = useState<StudentProfile | TeacherProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
 
   useEffect(() => {
     api.getMe()
@@ -74,9 +78,9 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" | 
 
   if (loading) {
     return (
-      <Screen>
-        <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 40 }} />
-      </Screen>
+      <View style={[styles.loadingWrap, { backgroundColor: colors.surface }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
     );
   }
 
@@ -84,7 +88,18 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" | 
   const teacherProfile = role === "teacher" ? (profile as TeacherProfile | null) : null;
 
   return (
-    <Screen>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: colors.surface }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
+    >
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
+        showsVerticalScrollIndicator={false}
+      >
       <Card style={styles.heroCard}>
         <View style={styles.avatarWrap}>
           <View style={[styles.avatar, { borderColor: colors.border, backgroundColor: colors.primaryLight }]}>
@@ -136,7 +151,7 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" | 
         </Card>
       )}
 
-      <ChangePasswordSection />
+      <ChangePasswordSection scrollRef={scrollRef} />
 
       {role === "student" && studentProfile && (
         <>
@@ -223,11 +238,14 @@ export default function ProfileScreen({ role }: { role: "student" | "teacher" | 
           )}
         </>
       )}
-    </Screen>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
+  loadingWrap: { flex: 1, alignItems: "center", justifyContent: "center" },
+  scrollContent: { padding: 16, paddingBottom: 40, gap: 0 },
   heroCard: { alignItems: "center", marginBottom: 8 },
   avatarWrap: { position: "relative", marginBottom: 12 },
   avatar: {
