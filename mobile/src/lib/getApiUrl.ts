@@ -16,6 +16,11 @@ function getDevMachineHost(): string | null {
 export function getApiUrl(): string {
   const envUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
 
+  // Production API (Render, etc.) — always use explicit HTTPS URL
+  if (envUrl?.startsWith("https://")) {
+    return envUrl;
+  }
+
   // In Expo Go dev, always use the same machine IP Metro is served from
   if (__DEV__) {
     const devHost = getDevMachineHost();

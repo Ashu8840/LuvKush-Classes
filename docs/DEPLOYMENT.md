@@ -5,7 +5,7 @@ Step-by-step instructions to deploy **Luv Kush Classes** from the monorepo:
 | App | Platform | Folder | Example URL |
 |-----|----------|--------|-------------|
 | Web frontend | **Vercel** | `frontend/` | `https://luvkush.vercel.app` |
-| API backend | **Render** | `backend/` | `https://luvkush-api.onrender.com` |
+| API backend | **Render** | `backend/` | `https://luvkush-classes.onrender.com` |
 | Database | **MongoDB Atlas** | — | Cloud connection string |
 
 **Repository:** [https://github.com/Ashu8840/LuvKush-Classes](https://github.com/Ashu8840/LuvKush-Classes)
@@ -38,6 +38,8 @@ Before you start, make sure you have:
 - A [Cloudinary](https://cloudinary.com) account (for file uploads — required for materials, avatars, etc.)
 
 **Deploy order:** MongoDB → Render (backend) → Vercel (frontend) → link env vars → test.
+
+> **Copy-paste env vars:** Open `backend/.env` and `frontend/.env.local` on your machine (full values with secrets). See [ENV_COPY_PASTE.md](./ENV_COPY_PASTE.md).
 
 ---
 
@@ -137,7 +139,7 @@ In Render → your service → **Environment**, add:
 
 1. Click **Create Web Service**.
 2. Wait for the build to finish (usually 2–5 minutes).
-3. Copy your service URL, e.g. `https://luvkush-api.onrender.com`.
+3. Copy your service URL, e.g. `https://luvkush-classes.onrender.com`.
 
 ### Step 4 — Verify backend
 
@@ -186,7 +188,7 @@ Before deploying, add:
 
 | Variable | Value |
 |----------|-------|
-| `NEXT_PUBLIC_API_URL` | `https://YOUR-SERVICE.onrender.com/api` |
+| `NEXT_PUBLIC_API_URL` | `https://luvkush-classes.onrender.com/api` |
 
 > **Important:** Include `/api` at the end. The frontend reads this in `frontend/src/lib/api.ts`.
 
