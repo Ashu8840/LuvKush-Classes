@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Luv Kush Classes",
+    "slug": "luvkush-classes",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.luvkush.classes",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Camera access is required for live class video.",
+        "NSMicrophoneUsageDescription": "Microphone access is required for live class audio."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.luvkush.classes",
+      "edgeToEdgeEnabled": true,
+      "softwareKeyboardLayoutMode": "resize",
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "MODIFY_AUDIO_SETTINGS"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-font",
+      "expo-audio",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#ea580c"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "luvkush-classes"
+      }
+    }
+  }
+}

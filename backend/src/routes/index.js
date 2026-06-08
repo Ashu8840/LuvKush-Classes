@@ -1,0 +1,58 @@
+const express = require("express");
+const authRoutes = require("./authRoutes");
+const adminRoutes = require("./adminRoutes");
+const teacherRoutes = require("./teacherRoutes");
+const studentRoutes = require("./studentRoutes");
+const courseRoutes = require("./courseRoutes");
+const batchRoutes = require("./batchRoutes");
+const attendanceRoutes = require("./attendanceRoutes");
+const feeRoutes = require("./feeRoutes");
+const examRoutes = require("./examRoutes");
+const aiRoutes = require("./aiRoutes");
+const notificationRoutes = require("./notificationRoutes");
+const uploadRoutes = require("./uploadRoutes");
+const libraryRoutes = require("./libraryRoutes");
+const certificateRoutes = require("./certificateRoutes");
+const certificationRoutes = require("./certificationRoutes");
+const liveClassRoutes = require("./liveClassRoutes");
+const shorthandRoutes = require("./shorthandRoutes");
+const typingRoutes = require("./typingRoutes");
+const gamificationRoutes = require("./gamificationRoutes");
+const analyticsRoutes = require("./analyticsRoutes");
+const paymentRoutes = require("./paymentRoutes");
+const parentRoutes = require("./parentRoutes");
+const announcementRoutes = require("./announcementRoutes");
+const feedbackRoutes = require("./feedbackRoutes");
+const { healthCheck, keepAlive } = require("../controllers/healthController");
+
+const router = express.Router();
+
+router.get("/health", healthCheck);
+router.get("/keep-alive", keepAlive);
+
+router.use("/auth", authRoutes);
+router.use("/admin", adminRoutes);
+router.use("/teacher", teacherRoutes);
+router.use("/student", studentRoutes);
+router.use("/courses", courseRoutes);
+router.use("/batches", batchRoutes);
+router.use("/attendance", attendanceRoutes);
+router.use("/fees", feeRoutes);
+router.use("/exams", examRoutes);
+router.use("/ai", aiRoutes);
+router.use("/notifications", notificationRoutes);
+router.use("/upload", uploadRoutes);
+router.use("/library", libraryRoutes);
+router.use("/certificates", certificateRoutes);
+router.use("/certifications", certificationRoutes);
+router.use("/live-classes", liveClassRoutes);
+router.use("/shorthand", shorthandRoutes);
+router.use("/typing", typingRoutes);
+router.use("/gamification", gamificationRoutes);
+router.use("/analytics", analyticsRoutes);
+router.use("/payments", paymentRoutes);
+router.use("/parent", parentRoutes);
+router.use("/announcements", announcementRoutes);
+router.use("/feedback", feedbackRoutes);
+
+module.exports = router;
