@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import { api, LiveClassSession } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { formatDateTime } from "@/lib/utils";
-import { useKeyboardInset } from "@/hooks/useKeyboardInset";
 
 type Props = {
   classId: string;
@@ -20,9 +19,6 @@ export function LiveClassRoom({ classId, isTeacher, onEnd }: Props) {
   const [chatText, setChatText] = useState("");
   const [tab, setTab] = useState<"chat" | "people">("people");
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const chatComposerRef = useRef<HTMLDivElement>(null);
-  const chatInputRef = useRef<HTMLInputElement>(null);
-  const { inset: keyboardInset, scrollAboveKeyboard } = useKeyboardInset();
 
   const refresh = async () => {
     try {
@@ -149,7 +145,7 @@ export function LiveClassRoom({ classId, isTeacher, onEnd }: Props) {
         </div>
       </div>
 
-      <div className="flex flex-col rounded-2xl border border-default bg-card overflow-hidden min-h-[min(420px,55dvh)] lg:min-h-[500px]">
+      <div className="flex flex-col rounded-2xl border border-default bg-card overflow-hidden min-h-[500px]">
         <div className="flex border-b border-default">
           {(["people", "chat"] as const).map((t) => (
             <button
@@ -211,13 +207,8 @@ export function LiveClassRoom({ classId, isTeacher, onEnd }: Props) {
         )}
 
         {tab === "chat" && (
-          <div className="relative flex min-h-0 flex-1 flex-col max-lg:min-h-[280px]">
-            <div
-              className="min-h-0 flex-1 overflow-y-auto p-3 pb-20 space-y-2 lg:pb-3"
-              style={{
-                paddingBottom: keyboardInset > 0 ? keyboardInset + 72 : undefined,
-              }}
-            >
+          <>
+            <div className="flex-1 overflow-y-auto p-3 space-y-2">
               {!session.chatEnabled ? (
                 <p className="text-center text-sm text-muted">Chat is disabled</p>
               ) : session.chatMessages?.length ? (
@@ -233,32 +224,24 @@ export function LiveClassRoom({ classId, isTeacher, onEnd }: Props) {
               <div ref={chatEndRef} />
             </div>
             {session.chatEnabled && isAdmitted && (
-              <div
-                ref={chatComposerRef}
-                className="z-20 flex shrink-0 items-center gap-2 border-t border-default bg-card p-3 max-lg:fixed max-lg:left-0 max-lg:right-0 lg:sticky lg:bottom-0"
-                style={{
-                  bottom: keyboardInset > 0 ? keyboardInset : 0,
-                }}
-              >
+              <div className="flex gap-2 border-t border-default p-3">
                 <input
-                  ref={chatInputRef}
                   value={chatText}
                   onChange={(e) => setChatText(e.target.value)}
-                  onFocus={() => scrollAboveKeyboard(chatInputRef.current)}
                   onKeyDown={(e) => e.key === "Enter" && sendChat()}
                   placeholder="Ask a question..."
-                  className="input-field min-h-[44px] flex-1 rounded-xl border px-3 py-2.5 text-sm"
+                  className="input-field flex-1 rounded-xl border px-3 py-2 text-sm"
                 />
                 <button
                   type="button"
                   onClick={sendChat}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground"
+                  className="rounded-xl bg-primary px-3 py-2 text-primary-foreground"
                 >
                   <MessageSquare className="h-4 w-4" />
                 </button>
               </div>
             )}
-          </div>
+          </>
         )}
       </div>
     </div>
