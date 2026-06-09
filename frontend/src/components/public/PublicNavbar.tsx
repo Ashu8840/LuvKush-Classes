@@ -8,6 +8,7 @@ import { ThemeSelector } from "@/components/layout/ThemeSelector";
 
 const NAV_LINKS = [
   { href: "/#home", label: "Home" },
+  { href: "/#mobile-app", label: "App" },
   { href: "/#about", label: "About" },
   { href: "/#testimonials", label: "Testimonials" },
   { href: "/#contact", label: "Contact Us" },

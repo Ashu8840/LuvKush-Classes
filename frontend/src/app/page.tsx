@@ -17,6 +17,7 @@ import { PublicNavbar } from "@/components/public/PublicNavbar";
 import { HeroSection } from "@/components/public/HeroSection";
 import { TestimonialsSection } from "@/components/public/TestimonialsSection";
 import { ContactForm } from "@/components/public/ContactForm";
+import { MobileAppDownload } from "@/components/public/MobileAppDownload";
 
 const EXPERTISE = [
   "Computer Fundamentals & History of Computers",
@@ -79,6 +80,8 @@ export default function Home() {
       <PublicNavbar />
 
       <HeroSection />
+
+      <MobileAppDownload />
 
       <section
         id="about"
