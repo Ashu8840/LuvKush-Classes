@@ -341,8 +341,10 @@ body {
 .badge-primary { background-color: var(--primary-light); color: var(--accent); }
 .badge-info { background-color: var(--primary-light); color: var(--primary); }
 
-/* Public navbar — theme-aware glassmorphism tab hover */
+/* Public navbar — theme-aware glassmorphism (desktop hover + touch tap) */
 .nav-link-glass {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
   border-radius: 0.75rem;
   padding: 0.5rem 1rem;
   font-weight: 700;
@@ -352,14 +354,22 @@ body {
   backdrop-filter: blur(0);
   -webkit-backdrop-filter: blur(0);
   transition:
-    color 0.25s ease,
-    background 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.25s ease,
-    backdrop-filter 0.25s ease;
+    color 0.2s ease,
+    background 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    backdrop-filter 0.2s ease,
+    transform 0.2s ease;
+}
+.nav-link-glass--menu {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 1rem;
 }
 .nav-link-glass:hover,
-.nav-link-glass:focus-visible {
+.nav-link-glass:active,
+.nav-link-glass:focus-visible,
+.nav-link-glass.nav-link-glass--active {
   color: var(--primary);
   background: color-mix(in srgb, var(--primary-light) 75%, transparent);
   border-color: color-mix(in srgb, var(--primary) 35%, transparent);
@@ -369,4 +379,16 @@ body {
     0 4px 20px color-mix(in srgb, var(--primary) 22%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--card) 55%, transparent);
   outline: none;
+  transform: translateY(-1px);
+}
+@media (hover: none) and (pointer: coarse) {
+  .nav-link-glass:hover:not(.nav-link-glass--active):not(:active) {
+    color: var(--muted);
+    background: transparent;
+    border-color: transparent;
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+    box-shadow: none;
+    transform: none;
+  }
 }
