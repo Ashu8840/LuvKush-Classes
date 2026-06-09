@@ -5,7 +5,6 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { FloatingSquares } from "@/components/public/FloatingSquares";
-import { MobileAppDownload } from "@/components/public/MobileAppDownload";
 
 const TypewriterText = ({
   text,
@@ -117,7 +116,6 @@ export function HeroSection() {
             >
               Meet the Instructor
             </a>
-            <MobileAppDownload variant="hero" />
           </motion.div>
         </div>
       </div>

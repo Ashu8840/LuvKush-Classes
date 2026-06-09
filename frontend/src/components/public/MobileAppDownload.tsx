@@ -3,20 +3,7 @@ import { Download, Smartphone } from "lucide-react";
 const APK_URL = "/LuvKush.apk";
 const APK_FILENAME = "LuvKush.apk";
 
-export function MobileAppDownload({ variant = "section" }: { variant?: "hero" | "section" }) {
-  if (variant === "hero") {
-    return (
-      <a
-        href={APK_URL}
-        download={APK_FILENAME}
-        className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-[#facc15] bg-[#facc15]/10 px-6 py-3 text-xs font-bold uppercase tracking-wider text-foreground shadow-sm transition hover:bg-[#facc15]/20 hover:shadow-[#facc15]/20 active:scale-[0.985] sm:px-8 sm:py-3.5 sm:text-sm"
-      >
-        <Smartphone className="h-4 w-4 text-[#eab308]" />
-        Download App
-      </a>
-    );
-  }
-
+export function MobileAppDownload() {
   return (
     <section
       id="mobile-app"
