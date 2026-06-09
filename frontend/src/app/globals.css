@@ -340,3 +340,33 @@ body {
 .badge-danger { background-color: var(--danger-light); color: var(--danger); }
 .badge-primary { background-color: var(--primary-light); color: var(--accent); }
 .badge-info { background-color: var(--primary-light); color: var(--primary); }
+
+/* Public navbar — theme-aware glassmorphism tab hover */
+.nav-link-glass {
+  border-radius: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  color: var(--muted);
+  border: 1px solid transparent;
+  background: transparent;
+  backdrop-filter: blur(0);
+  -webkit-backdrop-filter: blur(0);
+  transition:
+    color 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    backdrop-filter 0.25s ease;
+}
+.nav-link-glass:hover,
+.nav-link-glass:focus-visible {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary-light) 75%, transparent);
+  border-color: color-mix(in srgb, var(--primary) 35%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 4px 20px color-mix(in srgb, var(--primary) 22%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--card) 55%, transparent);
+  outline: none;
+}

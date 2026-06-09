@@ -8,10 +8,9 @@ import { ThemeSelector } from "@/components/layout/ThemeSelector";
 
 const NAV_LINKS = [
   { href: "/#home", label: "Home" },
-  { href: "/#mobile-app", label: "App" },
   { href: "/#about", label: "About" },
   { href: "/#testimonials", label: "Testimonials" },
-  { href: "/#contact", label: "Contact Us" },
+  { href: "/#contact", label: "Contact" },
 ];
 
 export function PublicNavbar() {
@@ -34,12 +33,12 @@ export function PublicNavbar() {
           />
         </Link>
 
-        <div className="hidden items-center gap-7 md:flex">
+        <div className="hidden items-center gap-1 md:flex">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-base font-bold text-muted transition hover:text-foreground"
+              className="nav-link-glass text-base"
             >
               {link.label}
             </Link>
@@ -73,7 +72,7 @@ export function PublicNavbar() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2 text-base font-bold text-foreground transition hover:bg-surface"
+                className="nav-link-glass text-base"
               >
                 {link.label}
               </Link>

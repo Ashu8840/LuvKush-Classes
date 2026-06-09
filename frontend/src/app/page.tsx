@@ -199,7 +199,7 @@ export default function Home() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold text-foreground md:text-4xl">
-              Contact Us
+              Contact
             </h2>
             <p className="mt-3 text-muted">
               Have questions about courses, batches, or admissions? Send us a
