@@ -275,15 +275,25 @@ Use this checklist after both services are deployed:
 
 ## 8. Mobile App (Optional)
 
-The mobile app is not deployed to Vercel or Render. Point it at your Render API:
+The mobile app is not deployed to Vercel or Render. For a full step-by-step guide — EAS login, Android APK build, and installing on your phone — see **[MOBILE_BUILD.md](./MOBILE_BUILD.md)**.
 
-1. Create `mobile/.env` (gitignored):
+Quick summary:
+
+1. Create `mobile/.env` (gitignored) for local Expo Go testing:
 
    ```
    EXPO_PUBLIC_API_URL=https://YOUR-SERVICE.onrender.com/api
    ```
 
-2. Rebuild with [EAS Build](https://docs.expo.dev/build/introduction/) or run via Expo Go for testing.
+2. For a downloadable Android APK, use EAS Build:
+
+   ```powershell
+   cd mobile
+   npx eas login
+   npx eas build --platform android --profile preview --non-interactive
+   ```
+
+3. Download the APK from [expo.dev](https://expo.dev) and install on your Android device.
 
 > **Note:** Render free tier has cold starts (~30–60 seconds on first request after idle). Mobile users may notice a delay on the first API call.
 

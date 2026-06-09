@@ -601,11 +601,14 @@ npx expo start --clear
 # Scan QR code with Expo Go app on your phone
 ```
 
-For production app store release:
+For a production Android APK (install directly on your phone):
+
 ```bash
-npx eas build --platform android
-npx eas build --platform ios
+npx eas login
+npx eas build --platform android --profile preview --non-interactive
 ```
+
+See the full guide: **[MOBILE_BUILD.md](./MOBILE_BUILD.md)** (EAS login, signing, build, install, troubleshooting).
 
 ---
 
@@ -748,7 +751,7 @@ Users (Browser / Phone)
 3. **Frontend:** Deploy `frontend/` folder to Vercel; set `NEXT_PUBLIC_API_URL` to backend URL
 4. **Seed data:** Run `npm run seed` once on the production database
 5. **Change passwords:** Update all default admin/teacher/student passwords immediately
-6. **Mobile:** Update `mobile/.env` with production API URL; build with EAS; submit to Play Store
+6. **Mobile:** Build Android APK with EAS — see [MOBILE_BUILD.md](./MOBILE_BUILD.md)
 
 ---
 
