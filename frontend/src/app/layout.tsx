@@ -18,7 +18,8 @@ export const metadata: Metadata = {
   title: "Luv Kush Classes | Shorthand & Typing Coaching",
   description: "Modern coaching platform for shorthand and typing courses",
   icons: {
-    icon: "/logo.png",
+    icon: [{ url: "/logo.png", type: "image/png" }],
+    shortcut: "/logo.png",
     apple: "/logo.png",
   },
 };

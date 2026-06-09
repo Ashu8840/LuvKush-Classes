@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { FloatingSquares } from "@/components/public/FloatingSquares";
+import { scrollToPublicSection } from "@/lib/public-scroll";
 
 const TypewriterText = ({
   text,
@@ -111,7 +112,11 @@ export function HeroSection() {
               Get Started <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
             <a
-              href="#about"
+              href="/"
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToPublicSection("about");
+              }}
               className="inline-flex items-center justify-center rounded-full border border-transparent px-6 py-3 text-xs font-bold uppercase tracking-wider text-muted transition hover:border-[#facc15] hover:text-foreground active:scale-[0.985] sm:px-8 sm:py-3.5 sm:text-sm"
             >
               Meet the Instructor

@@ -18,6 +18,7 @@ import { HeroSection } from "@/components/public/HeroSection";
 import { TestimonialsSection } from "@/components/public/TestimonialsSection";
 import { ContactForm } from "@/components/public/ContactForm";
 import { MobileAppDownload } from "@/components/public/MobileAppDownload";
+import { HomePageInit } from "@/components/public/HomePageInit";
 
 const EXPERTISE = [
   "Computer Fundamentals & History of Computers",
@@ -77,6 +78,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen overflow-x-hidden bg-background pt-public-nav text-foreground">
+      <HomePageInit />
       <PublicNavbar />
 
       <HeroSection />

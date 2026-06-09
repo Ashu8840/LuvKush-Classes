@@ -1,25 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type PointerEvent } from "react";
+import { useState, type MouseEvent, type PointerEvent } from "react";
 import { Menu, X } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { ThemeSelector } from "@/components/layout/ThemeSelector";
+import { scrollToPublicSection } from "@/lib/public-scroll";
 
 const NAV_LINKS = [
-  { href: "/#home", label: "Home" },
-  { href: "/#about", label: "About" },
-  { href: "/#testimonials", label: "Testimonials" },
-  { href: "/#contact", label: "Contact" },
+  { section: "home", label: "Home" },
+  { section: "about", label: "About" },
+  { section: "testimonials", label: "Testimonials" },
+  { section: "contact", label: "Contact" },
 ];
 
 function NavLink({
-  href,
+  section,
   label,
   menu = false,
   onNavigate,
 }: {
-  href: string;
+  section: string;
   label: string;
   menu?: boolean;
   onNavigate?: () => void;
@@ -33,15 +34,17 @@ function NavLink({
     setPressed(true);
   };
 
-  const handleClick = () => {
+  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    scrollToPublicSection(section);
     if (onNavigate) {
       window.setTimeout(onNavigate, 140);
     }
   };
 
   return (
-    <Link
-      href={href}
+    <a
+      href="/"
       className={`nav-link-glass text-base ${menu ? "nav-link-glass--menu" : ""} ${
         pressed ? "nav-link-glass--active" : ""
       }`}
@@ -52,7 +55,7 @@ function NavLink({
       onClick={handleClick}
     >
       {label}
-    </Link>
+    </a>
   );
 }
 
@@ -61,11 +64,18 @@ export function PublicNavbar() {
 
   const closeMenu = () => setOpen(false);
 
+  const scrollHome = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    scrollToPublicSection("home");
+    closeMenu();
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 w-full border-b border-default bg-card/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 pb-2 pt-[5px] sm:px-6 sm:pb-2.5">
-        <Link
+        <a
           href="/"
+          onClick={scrollHome}
           className="flex h-[80px] shrink-0 overflow-hidden"
           aria-label="Home"
         >
@@ -76,11 +86,11 @@ export function PublicNavbar() {
             priority
             className="translate-y-[20px] [&_img]:!translate-y-0"
           />
-        </Link>
+        </a>
 
         <div className="hidden items-center gap-1 sm:flex">
           {NAV_LINKS.map((link) => (
-            <NavLink key={link.href} href={link.href} label={link.label} />
+            <NavLink key={link.section} section={link.section} label={link.label} />
           ))}
         </div>
 
@@ -108,8 +118,8 @@ export function PublicNavbar() {
           <div className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => (
               <NavLink
-                key={link.href}
-                href={link.href}
+                key={link.section}
+                section={link.section}
                 label={link.label}
                 menu
                 onNavigate={closeMenu}
